@@ -13,6 +13,9 @@ app.get('/', (req, res) => {
 app.use('/api/users', routeUsers);
 app.use('/api/things', routeThings);
 
+// db connection
+
+// select
 app.get('/api/test', (req, res) => {
   // console.log({ req, res });
   console.log('/api/test');
@@ -33,22 +36,91 @@ app.get('/api/test', (req, res) => {
       return;
     }
     // connection
+    let responseResult = [];
+
+    // # async, await, promise를 사용한 방법
+    //  * result1: resolve값을 반환(await를 new Promise와 함께 사용하면)
+    const result1 = await new Promise((resolve, reject) => {
+      connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
+        if (err) throw err;
+        console.log('### SELECT * FROM USERS_TEST - 1');
+        console.log({ results });
+        resolve(results);
+      });
+    });
+
     connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
       if (err) throw err;
-      console.log('### SELECT * FROM USERS_TEST');
+      console.log('### SELECT * FROM USERS_TEST - 2');
       console.log({ results });
-      res.send({ result: results });
-
-      // res.send({
-      //   result: [
-      //     { index: 1, name: 'test1' },
-      //     { index: 2, name: 'test2' },
-      //   ],
-      // });
+      res.send({ result: [...result1, ...results] });
     });
+
+    // # promise, then을 사용한 방법
+    //  * result1: promise 객체 반환
+    // const result1 = new Promise((resolve, reject) => {
+    //   connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
+    //     if (err) throw err;
+    //     console.log('### SELECT * FROM USERS_TEST - 1');
+    //     console.log({ results });
+    //     resolve(results);
+    //   });
+    // });
+
+    // result1.then(
+    //   (result) => {
+    //     connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
+    //       if (err) throw err;
+    //       console.log('### SELECT * FROM USERS_TEST - 2');
+    //       console.log({ results });
+    //       res.send({ result: [...result, ...results] });
+    //     });
+    //   },
+    //   (error) => {
+    //     console.error;
+    //   },
+    // );
+
     connection.release();
   });
 });
+
+// insert
+app.get('/api/test/add', (req, res) => {
+  // console.log({ req, res });
+  console.log('/api/test');
+
+  dbPool.getConnection(async (err, connection) => {
+    if (err) {
+      switch (err.code) {
+        case 'PROTOCOL_CONNECTION_LOST':
+          console.error('Database connection was closed.');
+          break;
+        case 'ER_CON_COUNT_ERROR':
+          console.error('Database has too many connections.');
+          break;
+        case 'ECONNREFUSED':
+          console.error('Database connection was refused.');
+          break;
+      }
+      return;
+    }
+
+    // connection
+    connection.query(
+      `INSERT INTO users_test (token, email, nickname) VALUES (?,?,?));`,
+      ['토큰', '이메일', '닉네임'],
+      function (err, results) {
+        if (err) throw err;
+        console.log('### insert * FROM USERS_TEST');
+        console.log({ results });
+        res.send({ result: results });
+      },
+    );
+    connection.release();
+  });
+});
+
 app.get('/user/:id', (req, res) => {
   res.send('user/id');
   // console.log({ reqParams: req.params });
