@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "record-benefits",
+      "script": "npm",
+      "args": "start",
+      "watch": true
+    }
+  ]
+}

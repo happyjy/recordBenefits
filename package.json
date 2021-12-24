@@ -1,5 +1,5 @@
 {
-  "name": "calcwelfare",
+  "name": "record-benefits",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,18 +9,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/happyjy/recordWelfare.git"
+    "url": "git+https://github.com/happyjy/recordBenefits.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/happyjy/recordWelfare/issues"
+    "url": "https://github.com/happyjy/recordBenefits/issues"
   },
-  "homepage": "https://github.com/happyjy/recordWelfare#readme",
+  "homepage": "https://github.com/happyjy/recordBenefits#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "mysql": "^2.18.1",
-    "node": "^17.3.0"
+    "node": "^17.3.0",
+    "nodemon": "^2.0.15"
   }
 }
