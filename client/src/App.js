@@ -1,21 +1,59 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
-  const [state, setState] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [things, setThings] = useState([]);
   useEffect(() => {
-    callBackendAPI()
+    getUsers()
       .then((res) => {
-        console.log({ res });
-        setState(res.express);
+        console.log('### getUsers', res);
+        setUsers(res?.result);
+      })
+      .catch((err) => console.log(err));
+
+    getThings()
+      .then((res) => {
+        console.log('### getThings', res);
+        setThings(res?.result);
+      })
+      .catch((err) => console.log(err));
+
+    getApiTest()
+      .then((res) => {
+        console.log('### getApiTest', res);
       })
       .catch((err) => console.log(err));
   }, []);
 
-  const callBackendAPI = async () => {
+  const getUsers = async () => {
     try {
-      const response = await fetch('/users');
+      const response = await fetch('/api/users');
+      const body = await response.json();
+      if (response.status !== 200) {
+        throw Error(body.message);
+      }
+      return body;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getThings = async () => {
+    try {
+      const response = await fetch('/api/things/getAll');
+      const body = await response.json();
+      if (response.status !== 200) {
+        throw Error(body.message);
+      }
+      return body;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getApiTest = async () => {
+    try {
+      const response = await fetch('/api/test');
       const body = await response.json();
       if (response.status !== 200) {
         throw Error(body.message);
@@ -28,10 +66,18 @@ function App() {
   return (
     <div className='App'>
       <header className='App-header'>
-        call api
-        {state.map((v) => {
-          return <label key={v.index}>{v.name}</label>;
-        })}
+        <div>
+          call api test - users
+          {users?.map((v) => {
+            return <div key={v.index}>{v.name}</div>;
+          })}
+        </div>
+        <div>
+          call api test - things
+          {things?.map((v) => {
+            return <div key={v.index}>{v.name}</div>;
+          })}
+        </div>
       </header>
     </div>
   );
