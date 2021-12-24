@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [users, setUsers] = useState([]);
   const [things, setThings] = useState([]);
+  const [dbData, setDBData] = useState([]);
   useEffect(() => {
     getUsers()
       .then((res) => {
@@ -22,6 +23,7 @@ function App() {
     getApiTest()
       .then((res) => {
         console.log('### getApiTest', res);
+        setDBData(res?.result);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -76,6 +78,12 @@ function App() {
           call api test - things
           {things?.map((v) => {
             return <div key={v.index}>{v.name}</div>;
+          })}
+        </div>
+        <div>
+          call api test From DB
+          {dbData?.map((v) => {
+            return <div key={v.user_id}>{v.nickname}</div>;
           })}
         </div>
       </header>

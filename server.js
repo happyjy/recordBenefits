@@ -3,6 +3,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 const routeUsers = require('./routes/users');
 const routeThings = require('./routes/things');
+// db connection
+const { dbPool } = require('./dbConnection');
 
 app.get('/', (req, res) => {
   res.send('Hello World!!!');
@@ -14,11 +16,37 @@ app.use('/api/things', routeThings);
 app.get('/api/test', (req, res) => {
   // console.log({ req, res });
   console.log('/api/test');
-  res.send({
-    result: [
-      { index: 1, name: 'test1' },
-      { index: 2, name: 'test2' },
-    ],
+
+  dbPool.getConnection(async (err, connection) => {
+    if (err) {
+      switch (err.code) {
+        case 'PROTOCOL_CONNECTION_LOST':
+          console.error('Database connection was closed.');
+          break;
+        case 'ER_CON_COUNT_ERROR':
+          console.error('Database has too many connections.');
+          break;
+        case 'ECONNREFUSED':
+          console.error('Database connection was refused.');
+          break;
+      }
+      return;
+    }
+    // connection
+    connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
+      if (err) throw err;
+      console.log('### SELECT * FROM USERS_TEST');
+      console.log({ results });
+      res.send({ result: results });
+
+      // res.send({
+      //   result: [
+      //     { index: 1, name: 'test1' },
+      //     { index: 2, name: 'test2' },
+      //   ],
+      // });
+    });
+    connection.release();
   });
 });
 app.get('/user/:id', (req, res) => {
