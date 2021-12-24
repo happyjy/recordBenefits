@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const port = process.env.PORT || 5000;
 const routeUsers = require('./routes/users');
@@ -6,15 +7,14 @@ const routeThings = require('./routes/things');
 // db connection
 const { dbPool } = require('./dbConnection');
 
-app.get('/', (req, res) => {
-  res.send('Hello World!!!');
-});
+// app.get('/', (req, res) => {
+//   res.send('Hello World!!!');
+// });
 
 app.use('/api/users', routeUsers);
 app.use('/api/things', routeThings);
 
 // db connection
-
 // select
 app.get('/api/test', (req, res) => {
   // console.log({ req, res });
@@ -84,7 +84,6 @@ app.get('/api/test', (req, res) => {
     connection.release();
   });
 });
-
 // insert
 app.get('/api/test/add', (req, res) => {
   // console.log({ req, res });
@@ -135,10 +134,16 @@ app.get('/things/:name/:id', function (req, res) {
 });
 
 //Other routes here
-app.get('*', function (req, res) {
-  res.send('Sorry, this is an invalid URL.');
+// app.get('*', function (req, res) {
+//   res.send('Sorry, this is an invalid URL.');
+// });
+
+// # react route 설정
+app.use(express.static(path.join(__dirname, 'client/build')));
+app.use('*', function (req, res, next) {
+  res.sendFile(path.join(__dirname + '/client/build', 'index.html'));
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`app listening at http://localhost:${port}`);
 });

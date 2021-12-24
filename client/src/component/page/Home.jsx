@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
+import { Link } from 'react-router-dom';
 
-function App() {
+const Home = () => {
   const [users, setUsers] = useState([]);
   const [things, setThings] = useState([]);
   const [dbData, setDBData] = useState([]);
+
   useEffect(() => {
     getUsers()
       .then((res) => {
@@ -66,8 +67,14 @@ function App() {
     }
   };
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <>
+      <main>
+        <h2>Welcome to the homepage!</h2>
+        <p>You can do this, I believe in you.</p>
+      </main>
+      <nav>
+        <Link to='/about'>About</Link>
+
         <div>
           call api test - users
           {users?.map((v) => {
@@ -86,9 +93,8 @@ function App() {
             return <div key={v.user_id}>{v.nickname}</div>;
           })}
         </div>
-      </header>
-    </div>
+      </nav>
+    </>
   );
-}
-
-export default App;
+};
+export default Home;
