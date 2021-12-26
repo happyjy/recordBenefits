@@ -1,3 +1,7 @@
 
 /node_modules
 record-benefits.pem
+
+.env
+database.json
+database.md

@@ -1,3 +1,4 @@
+- [데이터 베이스 생성](#데이터-베이스-생성)
 - [테이블](#테이블)
   - [테이블 리스트](#테이블-리스트)
   - [테이블 쿼리](#테이블-쿼리)
@@ -5,14 +6,20 @@
   - [users Table](#users-table)
 - [insert data](#insert-data)
 
+# 데이터 베이스 생성
+
+```sql
+CREATE DATABASE recordBenefits default CHARACTER SET utf8;
+```
+
 # 테이블
 
 ## 테이블 리스트
 
     - users
 
-```
-SHOW TABLES;
+``` sql
+  SHOW TABLES;
 ```
 
 ## 테이블 쿼리

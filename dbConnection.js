@@ -1,16 +1,27 @@
 const mysql = require('mysql');
 let dbConfigObj;
 
-console.log('### dbConnection.js > mysql connection 설정 - dev');
-
-dbConfigObj = {
-  connectionLimit: 20,
-  host: '127.0.0.1',
-  user: 'jyoon',
-  password: '1004',
-  database: 'record_welfare',
-  multipleStatements: true,
-};
+if (process.env.NODE_ENV === 'production') {
+  console.log('### dbConnection.js > mysql connection 설정 - prod');
+  dbConfigObj = {
+    connectionLimit: 20,
+    host: process.env.endpoint,
+    user: process.env.username,
+    password: process.env.pw,
+    database: process.env.database,
+    multipleStatements: true,
+  };
+} else if (process.env.NODE_ENV === 'development') {
+  console.log('### dbConnection.js > mysql connection 설정 - dev');
+  dbConfigObj = {
+    connectionLimit: 20,
+    host: process.env.endpoint,
+    user: process.env.username,
+    password: process.env.pw,
+    database: process.env.database,
+    multipleStatements: true,
+  };
+}
 
 module.exports = {
   dbPool: mysql.createPool(dbConfigObj), // createPool 사용

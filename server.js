@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -41,17 +42,17 @@ app.get('/api/test', (req, res) => {
     // # async, await, promise를 사용한 방법
     //  * result1: resolve값을 반환(await를 new Promise와 함께 사용하면)
     const result1 = await new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
+      connection.query(`select * from users_test;`, [], function (err, results) {
         if (err) throw err;
-        console.log('### SELECT * FROM USERS_TEST - 1');
+        console.log('### select * from users_test - 1');
         console.log({ results });
         resolve(results);
       });
     });
 
-    connection.query(`SELECT * FROM USERS_TEST;`, [], function (err, results) {
+    connection.query(`select * from users_test;`, [], function (err, results) {
       if (err) throw err;
-      console.log('### SELECT * FROM USERS_TEST - 2');
+      console.log('### select * from users_test - 2');
       console.log({ results });
       res.send({ result: [...result1, ...results] });
     });
