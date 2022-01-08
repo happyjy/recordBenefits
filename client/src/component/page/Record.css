@@ -1,0 +1,4 @@
+.calendar div.MuiFormControl-root div.MuiOutlinedInput-root > input {
+  padding: 0;
+  text-align: center;
+}
