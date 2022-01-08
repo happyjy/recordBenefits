@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import './Record.css';
 import Button from '@mui/material/Button';
@@ -13,6 +13,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
 import { DatePicker, MobileDatePicker } from '@mui/lab';
+import { format } from 'date-fns';
 
 const RecordContainer = styled.div`
   margin: 1.5rem auto;
@@ -90,32 +91,6 @@ const ListItem = styled.div``;
 const ControlItemConteinr = styled.div``;
 
 const DownLoadButton = styled(Button)``;
-const rows = [
-  {
-    id: 1,
-    tag: '복지',
-    date: '2022-01-06',
-    content: '24/7 코트',
-    price: 280000,
-    receipt: 'File2',
-  },
-  {
-    id: 2,
-    tag: '복지',
-    date: '2022-01-16',
-    content: '24/7 니트',
-    price: 50000,
-    receipt: 'File2',
-  },
-  {
-    id: 3,
-    tag: '복지',
-    date: '2022-01-20',
-    content: '무텐다드 바지',
-    price: 30000,
-    receipt: 'File2',
-  },
-];
 
 // const columns = [
 //   { field: 'id', headerName: 'id', width: 20 },
@@ -127,19 +102,83 @@ const rows = [
 // ];
 
 const Record = () => {
+  const dummyData = [
+    {
+      id: 1,
+      tag: 2,
+      date: new Date(),
+      content: '24/7 코트',
+      price: 280000,
+      receipt: 'File2',
+    },
+    {
+      id: 2,
+      tag: 1,
+      date: new Date(),
+      content: '24/7 니트',
+      price: 50000,
+      receipt: 'File2',
+    },
+    {
+      id: 3,
+      tag: 0,
+      date: new Date(),
+      content: '무텐다드 바지',
+      price: 30000,
+      receipt: 'File2',
+    },
+  ];
+  const iconList = {
+    0: { label: '복지', icon: <SentimentVerySatisfiedIcon /> },
+    1: { label: '야근', icon: <NightlightIcon /> },
+    2: { label: '사무용품', icon: <WorkOutlineIcon /> },
+  };
+
   const fileuploadRef = useRef();
-  const [tagList, setTagList] = useState([true, false, false]);
+  const [tagList, setTagList] = useState([
+    { id: 0, label: '복지', status: true },
+    { id: 1, label: '야근', status: false },
+    { id: 2, label: '사무용품', status: false },
+  ]);
+  const [date, setDate] = useState(new Date());
+  const [content, setContent] = useState('');
+  const [benefitsList, setBenefitsList] = useState(dummyData);
 
   const onClickDelete = (e) => {};
   const onClickUploadRecipt = (e) => {
     fileuploadRef && fileuploadRef.current && fileuploadRef.current.click();
   };
+  useEffect(() => {
+    console.log({ tagList });
+  }, [tagList]);
+
   const onClickTag = (num) => {
-    setTagList(
-      Array.from({ length: 3 }, (_, i) => {
-        return i === num ? true : false;
-      }),
-    );
+    setTagList((prev) => {
+      return [
+        ...prev.map((v) => {
+          v.status = v.id === num ? true : false;
+          return v;
+        }),
+      ];
+    });
+    // Array.from({ length: 3 }, (_, i) => {
+    //   return i === num ? true : false;
+    // }),
+  };
+  const onChangeInput = (e) => {
+    setContent(e.target.value);
+  };
+  const onKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      onClickButton();
+      setContent('');
+    }
+  };
+  const onClickButton = (e) => {
+    console.log({ tag: tagList.filter((v) => v)[0], date, content });
+    setBenefitsList((prev) => {
+      return [...prev, { id: benefitsList.length + 1, tag: tagList.filter((v) => v.status)[0].id, date, content }];
+    });
   };
 
   return (
@@ -148,7 +187,20 @@ const Record = () => {
       <FormContainer>
         <FormItem style={{ justifyContent: 'space-between' }}>
           <ChipsContainer>
-            <Chip
+            {tagList?.map((v, i) => {
+              return (
+                <Chip
+                  key={v.id}
+                  label={iconList[v.id].label}
+                  onClick={() => onClickTag(v.id)}
+                  variant={v.status ? `contained` : `outlined`}
+                  size='small'
+                  icon={iconList[v.id].icon}
+                />
+              );
+            })}
+
+            {/* <Chip
               label='복지'
               onClick={() => onClickTag(0)}
               variant={tagList[0] ? `contained` : `outlined`}
@@ -168,14 +220,15 @@ const Record = () => {
               variant={tagList[2] ? `contained` : `outlined`}
               size='small'
               icon={<WorkOutlineIcon />}
-            />
+            /> */}
           </ChipsContainer>
           <div className='calendar' style={{ height: '24px', width: '100px' }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDatePicker
-                // value={value}
+                value={date}
                 onChange={(newValue) => {
-                  // setValue(newValue);
+                  // console.log({ newValue });
+                  setDate(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 inputFormat='yyyy.MM.dd'
@@ -184,19 +237,30 @@ const Record = () => {
           </div>
         </FormItem>
         <FormItem>
-          <AddTextFeild AddTextFeild='true' id='outlined-basic' placeholder='입력하세요' size='small' required />
-          <AddButton variant='contained'>ADD</AddButton>
+          <AddTextFeild
+            value={content}
+            onChange={(e) => onChangeInput(e)}
+            onKeyPress={(e) => onKeyPress(e)}
+            AddTextFeild='true'
+            id='outlined-basic'
+            placeholder='입력하세요'
+            size='small'
+            required
+          />
+          <AddButton onClick={(e) => onClickButton(e)} variant='contained'>
+            ADD
+          </AddButton>
         </FormItem>
 
         {/* <MobileDatePicker /> */}
       </FormContainer>
       <ListContainer>
-        {rows.map((v) => (
-          <ListItemContainer index={v.id}>
+        {benefitsList.map((v) => (
+          <ListItemContainer key={v.id} index={v.id}>
             <ListItemLeftContainer>
               <ListItem>{v.id}</ListItem>
-              <ListItem>{v.tag}</ListItem>
-              <ListItem>{v.date}</ListItem>
+              <ListItem>{iconList[v.tag].label}</ListItem>
+              <ListItem>{format(v.date, 'yyyy.MM.dd')}</ListItem>
               <ListItem style={{ minWidth: '70px', maxWidth: '200px', textAlign: 'left' }}>{v.content}</ListItem>
               <ListItem>{v.price}</ListItem>
             </ListItemLeftContainer>
