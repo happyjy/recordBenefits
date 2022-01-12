@@ -8,11 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import NightlightIcon from '@mui/icons-material/Nightlight';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-import CalendarPicker from '@mui/lab/CalendarPicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
-import { DatePicker, MobileDatePicker } from '@mui/lab';
+import { MobileDatePicker } from '@mui/lab';
 import { format } from 'date-fns';
 
 const RecordContainer = styled.div`
@@ -92,15 +91,6 @@ const ControlItemConteinr = styled.div``;
 
 const DownLoadButton = styled(Button)``;
 
-// const columns = [
-//   { field: 'id', headerName: 'id', width: 20 },
-//   { field: 'tag', headerName: 'tag', width: 40 },
-//   { field: 'date', headerName: 'date', width: 80 },
-//   { field: 'content', headerName: 'content', width: 200 },
-//   { field: 'price', headerName: 'price', width: 70 },
-//   { field: 'receipt', headerName: 'receipt', width: 40 },
-// ];
-
 const Record = () => {
   const dummyData = [
     {
@@ -161,9 +151,6 @@ const Record = () => {
         }),
       ];
     });
-    // Array.from({ length: 3 }, (_, i) => {
-    //   return i === num ? true : false;
-    // }),
   };
   const onChangeInput = (e) => {
     setContent(e.target.value);
@@ -199,35 +186,12 @@ const Record = () => {
                 />
               );
             })}
-
-            {/* <Chip
-              label='복지'
-              onClick={() => onClickTag(0)}
-              variant={tagList[0] ? `contained` : `outlined`}
-              size='small'
-              icon={<SentimentVerySatisfiedIcon />}
-            />
-            <Chip
-              label='야근'
-              onClick={() => onClickTag(1)}
-              variant={tagList[1] ? `contained` : `outlined`}
-              size='small'
-              icon={<NightlightIcon />}
-            />
-            <Chip
-              label='사무용품'
-              onClick={() => onClickTag(2)}
-              variant={tagList[2] ? `contained` : `outlined`}
-              size='small'
-              icon={<WorkOutlineIcon />}
-            /> */}
           </ChipsContainer>
           <div className='calendar' style={{ height: '24px', width: '100px' }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDatePicker
                 value={date}
                 onChange={(newValue) => {
-                  // console.log({ newValue });
                   setDate(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} />}
@@ -251,8 +215,6 @@ const Record = () => {
             ADD
           </AddButton>
         </FormItem>
-
-        {/* <MobileDatePicker /> */}
       </FormContainer>
       <ListContainer>
         {benefitsList.map((v) => (
@@ -274,9 +236,6 @@ const Record = () => {
         <input ref={fileuploadRef} type='file' multiple='true' hidden />
         <ControlItemConteinr></ControlItemConteinr>
       </ListContainer>
-      {/* <div style={{ height: 400, width: '100%' }}>
-        <DataGrid rows={rows} columns={columns} pageSize={5} rowsPerPageOptions={[5]} checkboxSelection />
-      </div> */}
     </RecordContainer>
   );
 };
