@@ -10,6 +10,7 @@ import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfi
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import EditIcon from '@mui/icons-material/Edit';
 
 import { MobileDatePicker } from '@mui/lab';
 import { format } from 'date-fns';
@@ -23,14 +24,12 @@ const RecordContainer = styled.div`
   color: #fff;
   box-shadow: -20px -20px 0px 0px rgba(100, 100, 100, 0.1);
 `;
-
 const Title = styled.h1`
   font-weight: normal;
   font-size: 2.6rem;
   letter-spacing: 0.05em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 `;
-
 const FormContainer = styled.div`
   /* border: 1px solid; */
   /* border: 1px solid yellow; */
@@ -43,7 +42,6 @@ const FormItem = styled.div`
   flex-direction: row;
   column-gap: 0.3rem;
 `;
-
 const ChipsContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -51,7 +49,6 @@ const ChipsContainer = styled.div`
   align-items: center;
   column-gap: 0.3rem;
 `;
-
 const AddTextFeild = styled(TextField)`
   /* height: 1.5rem; */
   border: 1px solid yellow;
@@ -60,7 +57,6 @@ const AddTextFeild = styled(TextField)`
 const AddButton = styled(Button)`
   /* line-height: 1.5rem; */
 `;
-
 const ListContainer = styled.div``;
 
 const ListItemContainer = styled.div`
@@ -88,6 +84,12 @@ const ListItemRightContainer = styled.div`
 `;
 const ListItem = styled.div``;
 const ControlItemConteinr = styled.div``;
+const Edit = styled(EditIcon)`
+  cursor: pointer;
+`;
+const Delete = styled(DeleteIcon)`
+  cursor: pointer;
+`;
 
 const DownLoadButton = styled(Button)``;
 
@@ -125,16 +127,45 @@ const Record = () => {
   };
 
   const fileuploadRef = useRef();
+  // { type: WRITE, index: null}, { type: EDIT, index}
+  const [mode, setMode] = useState({ type: 'WRITE', index: null });
+  const [benefitsList, setBenefitsList] = useState(dummyData);
   const [tagList, setTagList] = useState([
     { id: 0, label: '복지', status: true },
     { id: 1, label: '야근', status: false },
     { id: 2, label: '사무용품', status: false },
   ]);
-  const [date, setDate] = useState(new Date());
+  const [usedBenefitDate, setUsedBenefitDate] = useState(new Date());
+  const [totalPrice, setTotalPrice] = useState('');
   const [content, setContent] = useState('');
   const [price, setPrice] = useState();
-  const [benefitsList, setBenefitsList] = useState(dummyData);
 
+  const benefitInfo = useRef([]);
+  // const contentRef = useRef([]);
+
+  const onClickEdit = (e, id) => {
+    // console.log({ e, id });
+    // console.log(benefitInfo.current);
+    // benefitInfo.current.contenteditable = !benefitInfo.current.contenteditable;
+    const {
+      id: benefitsId,
+      tag,
+      date,
+      price,
+      content,
+    } = benefitsList.filter((v) => {
+      return v.id === id;
+    })[0];
+
+    console.log({ benefitsId, tag, date, price, content });
+
+    tagList.map((v) => (v.id === tag ? (v.status = true) : (v.status = false), v));
+    setUsedBenefitDate(date);
+    setPrice(price);
+    setContent(content);
+
+    setMode({ type: 'EDIT', index: id });
+  };
   const onClickDelete = (e, id) => {
     console.log({ e, id });
     setBenefitsList((prev) => prev.filter((v) => v.id !== id));
@@ -142,6 +173,15 @@ const Record = () => {
   const onClickUploadRecipt = (e) => {
     fileuploadRef && fileuploadRef.current && fileuploadRef.current.click();
   };
+  useEffect(() => {
+    // console.log({ tagList });
+    debugger;
+    setTotalPrice(
+      benefitsList.reduce((prev, curr) => {
+        return { price: prev.price + curr.price };
+      }).price,
+    );
+  }, [benefitsList]);
   useEffect(() => {
     // console.log({ tagList });
   }, [tagList]);
@@ -167,15 +207,37 @@ const Record = () => {
       // TODO: toast ui 만들기
       if (!content || !price) return;
       onClickButton();
-      setContent('');
-      setPrice('');
     }
   };
   const onClickButton = (e) => {
-    console.log({ tag: tagList.filter((v) => v)[0], date, content });
-    setBenefitsList((prev) => {
-      return [...prev, { id: benefitsList.length + 1, tag: tagList.filter((v) => v.status)[0].id, date, price, content }];
-    });
+    // console.log({ tag: tagList.filter((v) => v)[0], date: usedBenefitDate, content });
+    if (mode.type === 'WRITE') {
+      setBenefitsList((prev) => {
+        return [
+          ...prev,
+          {
+            id: benefitsList.length + 1,
+            tag: tagList.filter((v) => v.status)[0].id,
+            date: usedBenefitDate,
+            price: parseInt(price),
+            content,
+          },
+        ];
+      });
+    } else if (mode.type === 'EDIT') {
+      setBenefitsList((prev) =>
+        prev.map((v) => {
+          if (v.id === mode.index) {
+            v = { ...v, tag: tagList.filter((v) => v.status)[0].id, date: usedBenefitDate, price: parseInt(price), content };
+          }
+          return v;
+        }),
+      );
+    }
+    // init
+    setContent('');
+    setPrice('');
+    setMode({ type: 'WRITE', index: null });
   };
 
   return (
@@ -200,9 +262,9 @@ const Record = () => {
           <div className='calendar' style={{ height: '24px', width: '100px' }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDatePicker
-                value={date}
+                value={usedBenefitDate}
                 onChange={(newValue) => {
-                  setDate(newValue);
+                  setUsedBenefitDate(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 inputFormat='yyyy.MM.dd'
@@ -216,7 +278,7 @@ const Record = () => {
             value={price}
             onChange={(e) => onChangePrice(e)}
             onKeyPress={(e) => onKeyPress(e)}
-            AddTextFeild='true'
+            // addTextFeild='true'
             id='outlined-basic'
             placeholder='금액'
             size='small'
@@ -226,35 +288,44 @@ const Record = () => {
             value={content}
             onChange={(e) => onChangeContent(e)}
             onKeyPress={(e) => onKeyPress(e)}
-            AddTextFeild='true'
+            // addTextFeild='true'
             id='outlined-basic'
             placeholder='입력하세요'
             size='small'
             required
           />
           <AddButton onClick={(e) => onClickButton(e)} variant='contained'>
-            ADD
+            {mode.type === 'WRITE' && 'ADD'}
+            {mode.type === 'EDIT' && 'EDIT'}
           </AddButton>
         </FormItem>
       </FormContainer>
       <ListContainer>
+        {/* 합계 */}
+        <ListItemContainer>
+          <ListItemRightContainer>
+            <ListItem>총 금액: {totalPrice}</ListItem>
+            {/* <div contentEditable={true}>23</div> */}
+          </ListItemRightContainer>
+        </ListItemContainer>
         {benefitsList.map((v) => (
           <ListItemContainer key={v.id} index={v.id}>
-            <ListItemLeftContainer>
+            <ListItemLeftContainer ref={(el) => (benefitInfo.current[v.id] = el)}>
               <ListItem>{v.id}</ListItem>
               <ListItem>{iconList[v.tag].label}</ListItem>
               <ListItem>{format(v.date, 'yyyy.MM.dd')}</ListItem>
-              <ListItem>{v.price}</ListItem>
+              <ListItem /* contentEditable={true} */>{v.price}</ListItem>
               <ListItem style={{ minWidth: '70px', maxWidth: '200px', textAlign: 'left' }}>{v.content}</ListItem>
             </ListItemLeftContainer>
             <ListItemRightContainer>
               <ListItem>{v.receipt}</ListItem>
               <CloudUploadOutlinedIcon onClick={(e) => onClickUploadRecipt(e)} />
-              <DeleteIcon onClick={(e) => onClickDelete(e, v.id)} />
+              <Edit onClick={(e) => onClickEdit(e, v.id)} />
+              <Delete onClick={(e) => onClickDelete(e, v.id)} />
             </ListItemRightContainer>
           </ListItemContainer>
         ))}
-        <input ref={fileuploadRef} type='file' multiple='true' hidden />
+        <input ref={fileuploadRef} type='file' multiple={true} hidden />
         <ControlItemConteinr></ControlItemConteinr>
       </ListContainer>
     </RecordContainer>
