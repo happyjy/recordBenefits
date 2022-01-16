@@ -99,7 +99,7 @@ const Record = () => {
       date: new Date(),
       content: '24/7 코트',
       price: 280000,
-      receipt: 'File2',
+      receipt: 'file갯수',
     },
     {
       id: 2,
@@ -107,7 +107,7 @@ const Record = () => {
       date: new Date(),
       content: '24/7 니트',
       price: 50000,
-      receipt: 'File2',
+      receipt: 'file갯수',
     },
     {
       id: 3,
@@ -115,7 +115,7 @@ const Record = () => {
       date: new Date(),
       content: '무텐다드 바지',
       price: 30000,
-      receipt: 'File2',
+      receipt: 'file갯수',
     },
   ];
   const iconList = {
@@ -132,14 +132,18 @@ const Record = () => {
   ]);
   const [date, setDate] = useState(new Date());
   const [content, setContent] = useState('');
+  const [price, setPrice] = useState();
   const [benefitsList, setBenefitsList] = useState(dummyData);
 
-  const onClickDelete = (e) => {};
+  const onClickDelete = (e, id) => {
+    console.log({ e, id });
+    setBenefitsList((prev) => prev.filter((v) => v.id !== id));
+  };
   const onClickUploadRecipt = (e) => {
     fileuploadRef && fileuploadRef.current && fileuploadRef.current.click();
   };
   useEffect(() => {
-    console.log({ tagList });
+    // console.log({ tagList });
   }, [tagList]);
 
   const onClickTag = (num) => {
@@ -152,19 +156,25 @@ const Record = () => {
       ];
     });
   };
-  const onChangeInput = (e) => {
+  const onChangePrice = (e) => {
+    setPrice(e.target.value);
+  };
+  const onChangeContent = (e) => {
     setContent(e.target.value);
   };
   const onKeyPress = (e) => {
     if (e.key === 'Enter') {
+      // TODO: toast ui 만들기
+      if (!content || !price) return;
       onClickButton();
       setContent('');
+      setPrice('');
     }
   };
   const onClickButton = (e) => {
     console.log({ tag: tagList.filter((v) => v)[0], date, content });
     setBenefitsList((prev) => {
-      return [...prev, { id: benefitsList.length + 1, tag: tagList.filter((v) => v.status)[0].id, date, content }];
+      return [...prev, { id: benefitsList.length + 1, tag: tagList.filter((v) => v.status)[0].id, date, price, content }];
     });
   };
 
@@ -180,7 +190,7 @@ const Record = () => {
                   key={v.id}
                   label={iconList[v.id].label}
                   onClick={() => onClickTag(v.id)}
-                  variant={v.status ? `contained` : `outlined`}
+                  variant={v.status ? 'outlined' : 'contained'}
                   size='small'
                   icon={iconList[v.id].icon}
                 />
@@ -202,8 +212,19 @@ const Record = () => {
         </FormItem>
         <FormItem>
           <AddTextFeild
+            type='number'
+            value={price}
+            onChange={(e) => onChangePrice(e)}
+            onKeyPress={(e) => onKeyPress(e)}
+            AddTextFeild='true'
+            id='outlined-basic'
+            placeholder='금액'
+            size='small'
+            required
+          />
+          <AddTextFeild
             value={content}
-            onChange={(e) => onChangeInput(e)}
+            onChange={(e) => onChangeContent(e)}
             onKeyPress={(e) => onKeyPress(e)}
             AddTextFeild='true'
             id='outlined-basic'
@@ -223,13 +244,13 @@ const Record = () => {
               <ListItem>{v.id}</ListItem>
               <ListItem>{iconList[v.tag].label}</ListItem>
               <ListItem>{format(v.date, 'yyyy.MM.dd')}</ListItem>
-              <ListItem style={{ minWidth: '70px', maxWidth: '200px', textAlign: 'left' }}>{v.content}</ListItem>
               <ListItem>{v.price}</ListItem>
+              <ListItem style={{ minWidth: '70px', maxWidth: '200px', textAlign: 'left' }}>{v.content}</ListItem>
             </ListItemLeftContainer>
             <ListItemRightContainer>
               <ListItem>{v.receipt}</ListItem>
               <CloudUploadOutlinedIcon onClick={(e) => onClickUploadRecipt(e)} />
-              <DeleteIcon onClick={(e) => onClickDelete(e)} />
+              <DeleteIcon onClick={(e) => onClickDelete(e, v.id)} />
             </ListItemRightContainer>
           </ListItemContainer>
         ))}
