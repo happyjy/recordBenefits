@@ -125,16 +125,17 @@ const Record = () => {
     1: { label: '야근', icon: <NightlightIcon /> },
     2: { label: '사무용품', icon: <WorkOutlineIcon /> },
   };
-
-  const fileuploadRef = useRef();
-  // { type: WRITE, index: null}, { type: EDIT, index}
-  const [mode, setMode] = useState({ type: 'WRITE', index: null });
-  const [benefitsList, setBenefitsList] = useState(dummyData);
-  const [tagList, setTagList] = useState([
+  const initTagList = [
     { id: 0, label: '복지', status: true },
     { id: 1, label: '야근', status: false },
     { id: 2, label: '사무용품', status: false },
-  ]);
+  ];
+
+  const fileuploadRef = useRef();
+  // { type: "WRITE", index: null}, { type: EDIT, index}
+  const [mode, setMode] = useState({ type: 'WRITE', index: null });
+  const [benefitsList, setBenefitsList] = useState(dummyData);
+  const [tagList, setTagList] = useState(initTagList);
   const [usedBenefitDate, setUsedBenefitDate] = useState(new Date());
   const [totalPrice, setTotalPrice] = useState('');
   const [content, setContent] = useState('');
@@ -143,7 +144,7 @@ const Record = () => {
   const benefitInfo = useRef([]);
   // const contentRef = useRef([]);
 
-  const onClickEdit = (e, id) => {
+  const onClickEditIcon = (e, id) => {
     // console.log({ e, id });
     // console.log(benefitInfo.current);
     // benefitInfo.current.contenteditable = !benefitInfo.current.contenteditable;
@@ -206,38 +207,55 @@ const Record = () => {
     if (e.key === 'Enter') {
       // TODO: toast ui 만들기
       if (!content || !price) return;
-      onClickButton();
+      onClickCreate();
     }
   };
-  const onClickButton = (e) => {
-    // console.log({ tag: tagList.filter((v) => v)[0], date: usedBenefitDate, content });
-    if (mode.type === 'WRITE') {
-      setBenefitsList((prev) => {
-        return [
-          ...prev,
-          {
-            id: benefitsList.length + 1,
-            tag: tagList.filter((v) => v.status)[0].id,
-            date: usedBenefitDate,
-            price: parseInt(price),
-            content,
-          },
-        ];
-      });
-    } else if (mode.type === 'EDIT') {
-      setBenefitsList((prev) =>
-        prev.map((v) => {
-          if (v.id === mode.index) {
-            v = { ...v, tag: tagList.filter((v) => v.status)[0].id, date: usedBenefitDate, price: parseInt(price), content };
-          }
-          return v;
-        }),
-      );
-    }
-    // init
+  const onInitForm = () => {
+    setTagList((prev) =>
+      prev.map((v, i) => {
+        i === 0 ? (v.status = true) : (v.status = false);
+        return v;
+      }),
+    );
     setContent('');
     setPrice('');
     setMode({ type: 'WRITE', index: null });
+  };
+  const onClickCreate = (e) => {
+    // console.log({ tag: tagList.filter((v) => v)[0], date: usedBenefitDate, content });
+    if (!content || !price) return;
+
+    setBenefitsList((prev) => {
+      return [
+        ...prev,
+        {
+          id: benefitsList.length + 1,
+          tag: tagList.filter((v) => v.status)[0].id,
+          date: usedBenefitDate,
+          price: parseInt(price),
+          content,
+        },
+      ];
+    });
+
+    onInitForm();
+  };
+  const onClickEdit = (e) => {
+    setBenefitsList((prev) =>
+      prev.map((v) => {
+        if (v.id === mode.index) {
+          v = { ...v, tag: tagList.filter((v) => v.status)[0].id, date: usedBenefitDate, price: parseInt(price), content };
+        }
+        return v;
+      }),
+    );
+
+    onInitForm();
+  };
+
+  const onClickCancle = (e) => {
+    setMode({ type: 'WRITE', index: null });
+    onInitForm();
   };
 
   return (
@@ -275,6 +293,7 @@ const Record = () => {
         <FormItem>
           <AddTextFeild
             type='number'
+            min='1'
             value={price}
             onChange={(e) => onChangePrice(e)}
             onKeyPress={(e) => onKeyPress(e)}
@@ -294,10 +313,21 @@ const Record = () => {
             size='small'
             required
           />
-          <AddButton onClick={(e) => onClickButton(e)} variant='contained'>
-            {mode.type === 'WRITE' && 'ADD'}
-            {mode.type === 'EDIT' && 'EDIT'}
-          </AddButton>
+          {mode.type === 'WRITE' && (
+            <AddButton onClick={(e) => onClickCreate(e)} variant='contained'>
+              ADD
+            </AddButton>
+          )}
+          {mode.type === 'EDIT' && (
+            <AddButton onClick={(e) => onClickEdit(e)} variant='contained'>
+              EDIT
+            </AddButton>
+          )}
+          {mode.type === 'EDIT' && (
+            <AddButton onClick={(e) => onClickCancle(e)} variant='contained'>
+              CANCLE
+            </AddButton>
+          )}
         </FormItem>
       </FormContainer>
       <ListContainer>
@@ -320,7 +350,7 @@ const Record = () => {
             <ListItemRightContainer>
               <ListItem>{v.receipt}</ListItem>
               <CloudUploadOutlinedIcon onClick={(e) => onClickUploadRecipt(e)} />
-              <Edit onClick={(e) => onClickEdit(e, v.id)} />
+              <Edit onClick={(e) => onClickEditIcon(e, v.id)} />
               <Delete onClick={(e) => onClickDelete(e, v.id)} />
             </ListItemRightContainer>
           </ListItemContainer>
