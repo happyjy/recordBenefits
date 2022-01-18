@@ -145,8 +145,6 @@ const Record = () => {
   // const contentRef = useRef([]);
 
   const onClickEditIcon = (e, id) => {
-    // console.log({ e, id });
-    // console.log(benefitInfo.current);
     // benefitInfo.current.contenteditable = !benefitInfo.current.contenteditable;
     const {
       id: benefitsId,
@@ -158,8 +156,6 @@ const Record = () => {
       return v.id === id;
     })[0];
 
-    console.log({ benefitsId, tag, date, price, content });
-
     tagList.map((v) => (v.id === tag ? (v.status = true) : (v.status = false), v));
     setUsedBenefitDate(date);
     setPrice(price);
@@ -168,14 +164,12 @@ const Record = () => {
     setMode({ type: 'EDIT', index: id });
   };
   const onClickDelete = (e, id) => {
-    console.log({ e, id });
     setBenefitsList((prev) => prev.filter((v) => v.id !== id));
   };
   const onClickUploadRecipt = (e) => {
     fileuploadRef && fileuploadRef.current && fileuploadRef.current.click();
   };
   useEffect(() => {
-    // console.log({ tagList });
     debugger;
     setTotalPrice(
       benefitsList.reduce((prev, curr) => {
@@ -183,9 +177,7 @@ const Record = () => {
       }).price,
     );
   }, [benefitsList]);
-  useEffect(() => {
-    // console.log({ tagList });
-  }, [tagList]);
+  useEffect(() => {}, [tagList]);
 
   const onClickTag = (num) => {
     setTagList((prev) => {
@@ -222,7 +214,6 @@ const Record = () => {
     setMode({ type: 'WRITE', index: null });
   };
   const onClickCreate = (e) => {
-    // console.log({ tag: tagList.filter((v) => v)[0], date: usedBenefitDate, content });
     if (!content || !price) return;
 
     setBenefitsList((prev) => {
