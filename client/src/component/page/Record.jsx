@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import './Record.css';
-import Button from '@mui/material/Button';
-import { Chip, TextField } from '@mui/material';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
-import DeleteIcon from '@mui/icons-material/Delete';
-import NightlightIcon from '@mui/icons-material/Nightlight';
-import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import EditIcon from '@mui/icons-material/Edit';
+import React, { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import "./Record.css";
+import Button from "@mui/material/Button";
+import { Chip, TextField } from "@mui/material";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
+import NightlightIcon from "@mui/icons-material/Nightlight";
+import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import EditIcon from "@mui/icons-material/Edit";
 
-import { MobileDatePicker } from '@mui/lab';
-import { format } from 'date-fns';
+import { MobileDatePicker } from "@mui/lab";
+import { format } from "date-fns";
 
 const RecordContainer = styled.div`
   margin: 1.5rem auto;
@@ -93,52 +93,52 @@ const Delete = styled(DeleteIcon)`
 
 const DownLoadButton = styled(Button)``;
 
-const Record = () => {
-  const dummyData = [
-    {
-      id: 1,
-      tag: 2,
-      date: new Date(),
-      content: '24/7 코트',
-      price: 280000,
-      receipt: 'file갯수',
-    },
-    {
-      id: 2,
-      tag: 1,
-      date: new Date(),
-      content: '24/7 니트',
-      price: 50000,
-      receipt: 'file갯수',
-    },
-    {
-      id: 3,
-      tag: 0,
-      date: new Date(),
-      content: '무텐다드 바지',
-      price: 30000,
-      receipt: 'file갯수',
-    },
-  ];
-  const iconList = {
-    0: { label: '복지', icon: <SentimentVerySatisfiedIcon /> },
-    1: { label: '야근', icon: <NightlightIcon /> },
-    2: { label: '사무용품', icon: <WorkOutlineIcon /> },
-  };
-  const initTagList = [
-    { id: 0, label: '복지', status: true },
-    { id: 1, label: '야근', status: false },
-    { id: 2, label: '사무용품', status: false },
-  ];
+const dummyData = [
+  {
+    id: 1,
+    tag: 2,
+    date: new Date(),
+    content: "24/7 코트",
+    price: 280000,
+    receipt: "file갯수",
+  },
+  {
+    id: 2,
+    tag: 1,
+    date: new Date(),
+    content: "24/7 니트",
+    price: 50000,
+    receipt: "file갯수",
+  },
+  {
+    id: 3,
+    tag: 0,
+    date: new Date(),
+    content: "무텐다드 바지",
+    price: 30000,
+    receipt: "file갯수",
+  },
+];
 
+const iconList = {
+  0: { label: "복지", icon: <SentimentVerySatisfiedIcon /> },
+  1: { label: "야근", icon: <NightlightIcon /> },
+  2: { label: "사무용품", icon: <WorkOutlineIcon /> },
+};
+const initTagList = [
+  { id: 0, label: "복지", status: true },
+  { id: 1, label: "야근", status: false },
+  { id: 2, label: "사무용품", status: false },
+];
+const Record = () => {
   const fileuploadRef = useRef();
-  // { type: "WRITE", index: null}, { type: EDIT, index}
-  const [mode, setMode] = useState({ type: 'WRITE', index: null });
+  // { type: "WRITE", index: null}, { type: EDIT, index: int}
+  const [mode, setMode] = useState({ type: "WRITE", index: null });
   const [benefitsList, setBenefitsList] = useState(dummyData);
   const [tagList, setTagList] = useState(initTagList);
   const [usedBenefitDate, setUsedBenefitDate] = useState(new Date());
-  const [totalPrice, setTotalPrice] = useState('');
-  const [content, setContent] = useState('');
+  const [totalPrice, setTotalPrice] = useState("");
+  const [content, setContent] = useState("");
   const [price, setPrice] = useState();
 
   const benefitInfo = useRef([]);
@@ -156,12 +156,14 @@ const Record = () => {
       return v.id === id;
     })[0];
 
-    tagList.map((v) => (v.id === tag ? (v.status = true) : (v.status = false), v));
+    tagList.map(
+      (v) => (v.id === tag ? (v.status = true) : (v.status = false), v)
+    );
     setUsedBenefitDate(date);
     setPrice(price);
     setContent(content);
 
-    setMode({ type: 'EDIT', index: id });
+    setMode({ type: "EDIT", index: id });
   };
   const onClickDelete = (e, id) => {
     setBenefitsList((prev) => prev.filter((v) => v.id !== id));
@@ -170,11 +172,10 @@ const Record = () => {
     fileuploadRef && fileuploadRef.current && fileuploadRef.current.click();
   };
   useEffect(() => {
-    debugger;
     setTotalPrice(
       benefitsList.reduce((prev, curr) => {
         return { price: prev.price + curr.price };
-      }).price,
+      }).price
     );
   }, [benefitsList]);
   useEffect(() => {}, [tagList]);
@@ -196,10 +197,12 @@ const Record = () => {
     setContent(e.target.value);
   };
   const onKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       // TODO: toast ui 만들기
       if (!content || !price) return;
-      onClickCreate();
+
+      if (mode.type === "WRITE") onClickCreate();
+      if (mode.type === "EDIT") onClickEdit();
     }
   };
   const onInitForm = () => {
@@ -207,11 +210,11 @@ const Record = () => {
       prev.map((v, i) => {
         i === 0 ? (v.status = true) : (v.status = false);
         return v;
-      }),
+      })
     );
-    setContent('');
-    setPrice('');
-    setMode({ type: 'WRITE', index: null });
+    setContent("");
+    setPrice("");
+    setMode({ type: "WRITE", index: null });
   };
   const onClickCreate = (e) => {
     if (!content || !price) return;
@@ -235,17 +238,23 @@ const Record = () => {
     setBenefitsList((prev) =>
       prev.map((v) => {
         if (v.id === mode.index) {
-          v = { ...v, tag: tagList.filter((v) => v.status)[0].id, date: usedBenefitDate, price: parseInt(price), content };
+          v = {
+            ...v,
+            tag: tagList.filter((v) => v.status)[0].id,
+            date: usedBenefitDate,
+            price: parseInt(price),
+            content,
+          };
         }
         return v;
-      }),
+      })
     );
 
     onInitForm();
   };
 
   const onClickCancle = (e) => {
-    setMode({ type: 'WRITE', index: null });
+    setMode({ type: "WRITE", index: null });
     onInitForm();
   };
 
@@ -253,7 +262,7 @@ const Record = () => {
     <RecordContainer>
       <Title>복지 기록 하기</Title>
       <FormContainer>
-        <FormItem style={{ justifyContent: 'space-between' }}>
+        <FormItem style={{ justifyContent: "space-between" }}>
           <ChipsContainer>
             {tagList?.map((v, i) => {
               return (
@@ -261,14 +270,14 @@ const Record = () => {
                   key={v.id}
                   label={iconList[v.id].label}
                   onClick={() => onClickTag(v.id)}
-                  variant={v.status ? 'outlined' : 'contained'}
-                  size='small'
+                  variant={v.status ? "outlined" : "contained"}
+                  size="small"
                   icon={iconList[v.id].icon}
                 />
               );
             })}
           </ChipsContainer>
-          <div className='calendar' style={{ height: '24px', width: '100px' }}>
+          <div className="calendar" style={{ height: "24px", width: "100px" }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDatePicker
                 value={usedBenefitDate}
@@ -276,22 +285,22 @@ const Record = () => {
                   setUsedBenefitDate(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} />}
-                inputFormat='yyyy.MM.dd'
+                inputFormat="yyyy.MM.dd"
               />
             </LocalizationProvider>
           </div>
         </FormItem>
         <FormItem>
           <AddTextFeild
-            type='number'
-            min='1'
+            type="number"
+            min="1"
             value={price}
             onChange={(e) => onChangePrice(e)}
             onKeyPress={(e) => onKeyPress(e)}
             // addTextFeild='true'
-            id='outlined-basic'
-            placeholder='금액'
-            size='small'
+            id="outlined-basic"
+            placeholder="금액"
+            size="small"
             required
           />
           <AddTextFeild
@@ -299,23 +308,23 @@ const Record = () => {
             onChange={(e) => onChangeContent(e)}
             onKeyPress={(e) => onKeyPress(e)}
             // addTextFeild='true'
-            id='outlined-basic'
-            placeholder='입력하세요'
-            size='small'
+            id="outlined-basic"
+            placeholder="입력하세요"
+            size="small"
             required
           />
-          {mode.type === 'WRITE' && (
-            <AddButton onClick={(e) => onClickCreate(e)} variant='contained'>
+          {mode.type === "WRITE" && (
+            <AddButton onClick={(e) => onClickCreate(e)} variant="contained">
               ADD
             </AddButton>
           )}
-          {mode.type === 'EDIT' && (
-            <AddButton onClick={(e) => onClickEdit(e)} variant='contained'>
+          {mode.type === "EDIT" && (
+            <AddButton onClick={(e) => onClickEdit(e)} variant="contained">
               EDIT
             </AddButton>
           )}
-          {mode.type === 'EDIT' && (
-            <AddButton onClick={(e) => onClickCancle(e)} variant='contained'>
+          {mode.type === "EDIT" && (
+            <AddButton onClick={(e) => onClickCancle(e)} variant="contained">
               CANCLE
             </AddButton>
           )}
@@ -331,22 +340,34 @@ const Record = () => {
         </ListItemContainer>
         {benefitsList.map((v) => (
           <ListItemContainer key={v.id} index={v.id}>
-            <ListItemLeftContainer ref={(el) => (benefitInfo.current[v.id] = el)}>
+            <ListItemLeftContainer
+              ref={(el) => (benefitInfo.current[v.id] = el)}
+            >
               <ListItem>{v.id}</ListItem>
               <ListItem>{iconList[v.tag].label}</ListItem>
-              <ListItem>{format(v.date, 'yyyy.MM.dd')}</ListItem>
+              <ListItem>{format(v.date, "yyyy.MM.dd")}</ListItem>
               <ListItem /* contentEditable={true} */>{v.price}</ListItem>
-              <ListItem style={{ minWidth: '70px', maxWidth: '200px', textAlign: 'left' }}>{v.content}</ListItem>
+              <ListItem
+                style={{
+                  minWidth: "70px",
+                  maxWidth: "200px",
+                  textAlign: "left",
+                }}
+              >
+                {v.content}
+              </ListItem>
             </ListItemLeftContainer>
             <ListItemRightContainer>
               <ListItem>{v.receipt}</ListItem>
-              <CloudUploadOutlinedIcon onClick={(e) => onClickUploadRecipt(e)} />
+              <CloudUploadOutlinedIcon
+                onClick={(e) => onClickUploadRecipt(e)}
+              />
               <Edit onClick={(e) => onClickEditIcon(e, v.id)} />
               <Delete onClick={(e) => onClickDelete(e, v.id)} />
             </ListItemRightContainer>
           </ListItemContainer>
         ))}
-        <input ref={fileuploadRef} type='file' multiple={true} hidden />
+        <input ref={fileuploadRef} type="file" multiple={true} hidden />
         <ControlItemConteinr></ControlItemConteinr>
       </ListContainer>
     </RecordContainer>

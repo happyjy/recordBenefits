@@ -18,7 +18,7 @@ CREATE DATABASE recordBenefits default CHARACTER SET utf8;
 
     - users
 
-``` sql
+```sql
   SHOW TABLES;
 ```
 
@@ -58,7 +58,7 @@ ALTER TABLE users RENAME COLUMN use_id TO user_id;
 ALTER TABLE users ADD couple_id INT AFTER email;
 ```
 
-# insert data
+# init sample data insert data
 
 ```sql
   INSERT INTO users_test (token, email, nickname) VALUES ('토큰1', 'okwoyjy@gmail.com', '재윤');
