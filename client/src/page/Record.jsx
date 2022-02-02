@@ -5,15 +5,18 @@ import Button from "@mui/material/Button";
 import { Chip, TextField } from "@mui/material";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
-import NightlightIcon from "@mui/icons-material/Nightlight";
-import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+// import NightlightIcon from "@mui/icons-material/Nightlight";
+// import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
+// import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import EditIcon from "@mui/icons-material/Edit";
-
 import { MobileDatePicker } from "@mui/lab";
 import { format } from "date-fns";
+import useBenefitTypeList from "../hook/useBenefitTypeList";
+import useDatePicker from "../hook/useDatePicker";
+import usePriceInput from "../hook/usePriceInput";
+import useContentInput from "../hook/useContentInput";
 
 const RecordContainer = styled.div`
   margin: 1.5rem auto;
@@ -42,13 +45,7 @@ const FormItem = styled.div`
   flex-direction: row;
   column-gap: 0.3rem;
 `;
-const ChipsContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  column-gap: 0.3rem;
-`;
+
 const AddTextFeild = styled(TextField)`
   /* height: 1.5rem; */
   border: 1px solid yellow;
@@ -120,26 +117,26 @@ const dummyData = [
   },
 ];
 
-const iconList = {
-  0: { label: "복지", icon: <SentimentVerySatisfiedIcon /> },
-  1: { label: "야근", icon: <NightlightIcon /> },
-  2: { label: "사무용품", icon: <WorkOutlineIcon /> },
-};
-const initTagList = [
-  { id: 0, label: "복지", status: true },
-  { id: 1, label: "야근", status: false },
-  { id: 2, label: "사무용품", status: false },
-];
+// const iconList = {
+//   0: { label: "복지", icon: <SentimentVerySatisfiedIcon /> },
+//   1: { label: "야근", icon: <NightlightIcon /> },
+//   2: { label: "사무용품", icon: <WorkOutlineIcon /> },
+// };
+// const initTagList = [
+//   { id: 0, label: "복지", status: true },
+//   { id: 1, label: "야근", status: false },
+//   { id: 2, label: "사무용품", status: false },
+// ];
 const Record = () => {
   const fileuploadRef = useRef();
   // { type: "WRITE", index: null}, { type: EDIT, index: int}
   const [mode, setMode] = useState({ type: "WRITE", index: null });
   const [benefitsList, setBenefitsList] = useState(dummyData);
-  const [tagList, setTagList] = useState(initTagList);
-  const [usedBenefitDate, setUsedBenefitDate] = useState(new Date());
+  // const [tagList, setTagList] = useState(initTagList);
+  // const [usedBenefitDate, setUsedBenefitDate] = useState(new Date());
   const [totalPrice, setTotalPrice] = useState("");
-  const [content, setContent] = useState("");
-  const [price, setPrice] = useState();
+  // const [content, setContent] = useState("");
+  // const [price, setPrice ] = useState();
 
   const benefitInfo = useRef([]);
   // const contentRef = useRef([]);
@@ -171,6 +168,7 @@ const Record = () => {
   const onClickUploadRecipt = (e) => {
     fileuploadRef && fileuploadRef.current && fileuploadRef.current.click();
   };
+
   useEffect(() => {
     setTotalPrice(
       benefitsList.reduce((prev, curr) => {
@@ -178,33 +176,34 @@ const Record = () => {
       }).price
     );
   }, [benefitsList]);
-  useEffect(() => {}, [tagList]);
 
-  const onClickTag = (num) => {
-    setTagList((prev) => {
-      return [
-        ...prev.map((v) => {
-          v.status = v.id === num ? true : false;
-          return v;
-        }),
-      ];
-    });
-  };
+  // useEffect(() => {}, [tagList]);
+
+  // const onClickTag = (num) => {
+  //   setTagList((prev) => {
+  //     return [
+  //       ...prev.map((v) => {
+  //         v.status = v.id === num ? true : false;
+  //         return v;
+  //       }),
+  //     ];
+  //   });
+  // };
   const onChangePrice = (e) => {
     setPrice(e.target.value);
   };
   const onChangeContent = (e) => {
     setContent(e.target.value);
   };
-  const onKeyPress = (e) => {
-    if (e.key === "Enter") {
-      // TODO: toast ui 만들기
-      if (!content || !price) return;
+  // const onKeyPress = (e) => {
+  //   if (e.key === "Enter") {
+  //     // TODO: toast ui 만들기
+  //     if (!content || !price) return;
 
-      if (mode.type === "WRITE") onClickCreate();
-      if (mode.type === "EDIT") onClickEdit();
-    }
-  };
+  //     if (mode.type === "WRITE") onClickCreate();
+  //     if (mode.type === "EDIT") onClickEdit();
+  //   }
+  // };
   const onInitForm = () => {
     setTagList((prev) =>
       prev.map((v, i) => {
@@ -217,6 +216,7 @@ const Record = () => {
     setMode({ type: "WRITE", index: null });
   };
   const onClickCreate = (e) => {
+    console.log("onClickCreate");
     if (!content || !price) return;
 
     setBenefitsList((prev) => {
@@ -235,6 +235,7 @@ const Record = () => {
     onInitForm();
   };
   const onClickEdit = (e) => {
+    console.log("onClickEdit");
     setBenefitsList((prev) =>
       prev.map((v) => {
         if (v.id === mode.index) {
@@ -252,18 +253,49 @@ const Record = () => {
 
     onInitForm();
   };
-
   const onClickCancle = (e) => {
     setMode({ type: "WRITE", index: null });
     onInitForm();
   };
+
+  const onKeyPress = ({ e, onClickCreate, onClickEdit }) => {
+    if (e.key === "Enter") {
+      console.log("--- Enter");
+      // TODO: toast ui 만들기
+      if (!content || !price) return;
+
+      if (mode.type === "WRITE") onClickCreate();
+      if (mode.type === "EDIT") onClickEdit();
+    }
+  };
+
+  // customHooks
+  const [iconList, tagList, setTagList, BenefitTypeListComponent] =
+    useBenefitTypeList();
+  const [usedBenefitDate, setUsedBenefitDate, DatePickerComponent] =
+    useDatePicker();
+  var [price, setPrice, PriceInputComponent] = usePriceInput({
+    mode,
+    content,
+    onClickCreate,
+    onClickEdit,
+    onKeyPress,
+  });
+  var [content, setContent, ContentInputComponent] = useContentInput({
+    mode,
+    price,
+    onClickCreate,
+    onClickEdit,
+    onKeyPress,
+  });
 
   return (
     <RecordContainer>
       <Title>복지 기록 하기</Title>
       <FormContainer>
         <FormItem style={{ justifyContent: "space-between" }}>
-          <ChipsContainer>
+          <BenefitTypeListComponent />
+          {/* <ChipsContainer>
             {tagList?.map((v, i) => {
               return (
                 <Chip
@@ -276,8 +308,9 @@ const Record = () => {
                 />
               );
             })}
-          </ChipsContainer>
-          <div className="calendar" style={{ height: "24px", width: "100px" }}>
+          </ChipsContainer> */}
+          <DatePickerComponent />
+          {/* <div className="calendar" style={{ height: "24px", width: "100px" }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <MobileDatePicker
                 value={usedBenefitDate}
@@ -288,10 +321,12 @@ const Record = () => {
                 inputFormat="yyyy.MM.dd"
               />
             </LocalizationProvider>
-          </div>
+          </div> */}
         </FormItem>
         <FormItem>
-          <AddTextFeild
+          {PriceInputComponent}
+          {/* <PriceInputComponent price={price} setPrice={setPrice} /> */}
+          {/* <AddTextFeild
             type="number"
             min="1"
             value={price}
@@ -302,8 +337,9 @@ const Record = () => {
             placeholder="금액"
             size="small"
             required
-          />
-          <AddTextFeild
+          /> */}
+          {ContentInputComponent}
+          {/* <AddTextFeild
             value={content}
             onChange={(e) => onChangeContent(e)}
             onKeyPress={(e) => onKeyPress(e)}
@@ -312,7 +348,7 @@ const Record = () => {
             placeholder="입력하세요"
             size="small"
             required
-          />
+          /> */}
           {mode.type === "WRITE" && (
             <AddButton onClick={(e) => onClickCreate(e)} variant="contained">
               ADD
